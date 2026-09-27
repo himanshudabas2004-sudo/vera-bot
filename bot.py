@@ -30,12 +30,8 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 # google-genai SDK for Gemini integration
-try:
-    from google import genai
-    from google.genai import types
-    HAS_GOOGLE_GENAI = True
-except ImportError:
-    HAS_GOOGLE_GENAI = False
+from google import genai
+from google.genai import types, Client
 
 # Configure logging
 logging.basicConfig(
@@ -536,15 +532,15 @@ Customer: Priya (lapsed_soft, 5 months since last visit, weekday-evening prefere
 """
 
 
-def _get_gemini_client() -> genai.Client | None:
+def _get_gemini_client() -> Client | None:
     """Initialize Google GenAI client if API key is present."""
     api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key or not HAS_GOOGLE_GENAI:
+    if not api_key:
         return None
     try:
-        return genai.Client(api_key=api_key)
+        return Client(api_key=api_key)
     except Exception as exc:
-        logger.warning("Could not initialize genai.Client: %s", exc)
+        logger.warning("Could not initialize Client: %s", exc)
         return None
 
 
